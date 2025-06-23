@@ -1,0 +1,39 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Vesoul.uss?fileID=7433441132597879392&amp;guid=78101fb1290dfc740978c3aa540a1ffe&amp;type=3#Vesoul" />
+    <ui:VisualElement name="background" style="flex-grow: 1; position: absolute; width: 100%; height: 95%; flex-shrink: 0; background-image: url(&quot;project://database/Assets/Img/Background.png?fileID=-1955448553306655712&amp;guid=1c25f378f69b4e44ba0ca6bcc16cf8a4&amp;type=3#Background_0&quot;);" />
+    <ui:VisualElement name="roadSign" style="flex-grow: 1; position: absolute; align-self: center; width: 100%; height: 100%; flex-shrink: 0;" />
+    <ui:VisualElement name="dashboard" style="flex-grow: 0; position: absolute; align-self: center; width: 100%; height: 450px; justify-content: flex-end; align-content: flex-end; flex-shrink: 0; bottom: 0; background-image: url(&quot;project://database/Assets/Img/DashboardBase.png?fileID=7009663376328020329&amp;guid=8c8cda00bd49247468ef04677b12c55f&amp;type=3#DashboardBase_0&quot;); -unity-background-scale-mode: stretch-to-fill; background-position-y: bottom 0; background-position-x: right 0; background-size: 100% 70%;">
+        <ui:VisualElement name="steeringWheel" style="flex-grow: 1; position: absolute; height: 400px; width: 1100px; left: 0; align-content: flex-end; justify-content: flex-end; align-items: flex-end; background-image: url(&quot;project://database/Assets/Img/SteeringWheel.png?fileID=-4464528053615996914&amp;guid=67fee8913d058ce40809c38fbff4cd8b&amp;type=3#SteeringWheel_0&quot;); -unity-background-scale-mode: scale-and-crop; background-position-x: right 0; background-position-y: bottom 0;">
+            <ui:VisualElement name="startStop" style="flex-grow: 1; position: absolute; height: 400px; width: 200px; align-content: center; justify-content: center;">
+                <ui:Button name="startButton" style="height: 200px; background-color: rgba(188, 188, 188, 0); background-image: url(&quot;project://database/Assets/Img/StartStop.png?fileID=-3092215582660001481&amp;guid=945c2a289b8e8904bbd10448f5c3a7a8&amp;type=3#StartButton&quot;); width: 200px;" />
+                <ui:Button name="stopButton" style="height: 200px; background-color: rgba(188, 188, 188, 0); background-image: url(&quot;project://database/Assets/Img/StartStop.png?fileID=1224154402505867584&amp;guid=945c2a289b8e8904bbd10448f5c3a7a8&amp;type=3#StopButton&quot;); width: 200px;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="airBlowerLeft" style="flex-grow: 0; position: absolute; left: 0; width: 20%; height: 85%; top: auto; background-image: url(&quot;project://database/Assets/Img/AirBlowerLeft.png?fileID=-2080386289436306332&amp;guid=8878e4b3ed21344469e420a5feacb938&amp;type=3#AirBlowerLeft_0&quot;); -unity-background-scale-mode: scale-and-crop; background-position-x: left 0; background-size: 200px 230px; flex-shrink: 0; bottom: 35px;" />
+        <ui:VisualElement name="airBlowerRight" style="flex-grow: 0; position: absolute; left: auto; width: 20%; height: 85%; top: auto; background-image: url(&quot;project://database/Assets/Img/AirBlowerRight.png?fileID=2288012991731438895&amp;guid=47050109d8616fd4badce5219a76ef49&amp;type=3#AirBlowerRight_0&quot;); -unity-background-scale-mode: scale-and-crop; background-position-x: right 0; background-size: 200px 230px; flex-shrink: 0; right: 0; bottom: 35px;" />
+    </ui:VisualElement>
+    <ui:VisualElement name="autorisationPanel" class="textField" style="flex-grow: 1; justify-content: center; align-content: center; align-items: center;">
+        <ui:VisualElement name="autorisationForm" style="flex-grow: 1; position: absolute; width: 900px; height: 600px; padding-left: 50px; padding-right: 50px; align-content: center; justify-content: center;">
+            <ui:TabView name="tabView" style="background-size: 100% 100%; height: 400px;">
+                <ui:Tab label="SE CONNECTER" tabindex="0" name="seConnecterTab" style="height: 400px;">
+                    <ui:Label text="Warning" name="signInWarning" style="height: 60px; margin-top: 20px; margin-right: 0; margin-bottom: 20px; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+                    <ui:TextField label="E-mail" placeholder-text="Votre adresse email ..." name="signInEmailInput" readonly="false" class="inputField" style="margin-top: 10px; margin-bottom: 10px; margin-right: 0; margin-left: 0;" />
+                    <ui:TextField label="Password" placeholder-text="Votre mot de passe ..." name="signInPasswordInput" password="false" class="inputField" style="margin-top: 10px; margin-bottom: 10px; margin-right: 0; margin-left: 0;" />
+                    <ui:VisualElement name="buttonContainer" style="flex-grow: 0; flex-shrink: 0; justify-content: center; height: 100px; flex-direction: row; align-items: center;">
+                        <ui:Button text="Se connecter" name="signInButton" style="width: 200px; height: 50px; margin-right: 0; margin-left: 0; position: absolute; right: 0; margin-top: 0; margin-bottom: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+                    </ui:VisualElement>
+                </ui:Tab>
+                <ui:Tab label="CRÉER UN COMPTE" tabindex="0" name="creerCompteTab" style="height: 400px;">
+                    <ui:Label text="Warning" name="signUpWarning" style="height: 60px; margin-top: 20px; margin-right: 0; margin-bottom: 20px; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+                    <ui:TextField label="E-mail" placeholder-text="Votre adresse email ..." name="signUpEmailInput" readonly="false" style="margin-top: 10px; margin-right: 0; margin-bottom: 10px; margin-left: 0;" />
+                    <ui:TextField label="Password" placeholder-text="Votre mot de passe ..." name="signUpPasswordInput" style="margin-top: 10px; margin-right: 0; margin-bottom: 10px; margin-left: 0;" />
+                    <ui:TextField label="Confirm Password" placeholder-text="Confirmez votre mot de passe ..." name="confirmPasswordInput" style="margin-top: 10px; margin-right: 0; margin-bottom: 10px; margin-left: 0;" />
+                    <ui:VisualElement name="buttonContainer" style="flex-grow: 0; flex-shrink: 0; justify-content: center; height: 100px; flex-direction: row; align-items: center;">
+                        <ui:Button text="Créer un compte" name="signUpButton" style="width: 200px; height: 50px; margin-right: 0; margin-left: 0; position: absolute; right: 0; margin-top: 0; margin-bottom: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+                    </ui:VisualElement>
+                </ui:Tab>
+            </ui:TabView>
+        </ui:VisualElement>
+        <ui:Button text="EXIT" name="exitButton" style="position: absolute; top: 50px; right: 50px;" />
+    </ui:VisualElement>
+</ui:UXML>
