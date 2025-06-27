@@ -16,9 +16,6 @@ public class GameSceneManager : MonoBehaviour
     [SerializeField]
     private UIgameScene uiGameScene;
 
-    [SerializeField]
-    private Player player;
-
     private string cityToGuess;
 
     public List<string> alreadyPlayed = new List<string>();
@@ -31,12 +28,11 @@ public class GameSceneManager : MonoBehaviour
 
     private string inputFirstLetter;
 
-
-
     public event Action<string> ShowCityToGuess;
     public event Action<List<string>> AlreadyPlayedUpdate;
     public event Action<int> FuelUpdate;
     public event Action<string> CommentUpdate;
+
     void Awake()
     {
         uiGameScene.PlayerMadeInput += DisplayCityToGuess;
@@ -54,13 +50,21 @@ public class GameSceneManager : MonoBehaviour
         AlreadyPlayedUpdate?.Invoke(alreadyPlayed);
         CommentUpdate?.Invoke("ENTREZ UNE LETTRE\nOU LE NOM DE LA VILLE EN ENTIER");
         FuelUpdate?.Invoke(remainingFuel);
+
+        Debug.Log(Player.Instance.currentPlayer.playerEmail);
+        Debug.Log(Player.Instance.currentPlayer.experience);
+
+        foreach (string city in Player.Instance.currentPlayer.visitedCities)
+        {
+            Debug.Log(city);
+        }
     }
 
     private void FindNotYetGuessed()
     {
         foreach (CityData city in cityDataBase.cities)
         {
-            if (!player.visitedCities.Contains(city.cityName.ToUpper()))
+            if (!Player.Instance.currentPlayer.visitedCities.Contains(city.cityName.ToUpper()))
             {
                 notYetGuessedCities.Add(city.cityName);
             }
@@ -186,13 +190,6 @@ public class GameSceneManager : MonoBehaviour
     {
         if (CheckInput(input))
         {
-            // if (input.ToUpper() == cityToGuess.ToUpper())
-            // {
-            //     VisitCity?.Invoke(cityToGuess.ToUpper());
-            //     Debug.Log($"Event invoked, cities: {Player.Instance.visitedCities.Count}");
-            //     StartCoroutine(LoadScene());
-            // }
-
             if (cityDisplayVersion == cityToGuess.ToUpper() || input.ToUpper() == cityToGuess.ToUpper())
             {
                 Player.Instance.AddVisitedCity(cityToGuess.ToUpper());

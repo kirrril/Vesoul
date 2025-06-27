@@ -7,71 +7,51 @@ public class EntrySceneManager : MonoBehaviour
 {
     [SerializeField]
     private UIentryScene uiEntryScene;
+    [SerializeField]
+    private Player player;
     public StartStop startStop;
 
-    public event Action signInEmailDoesntMatch;
     public event Action signUpEmailDoesMatch;
-    public event Action readyToEnterSignInPassword;
-    public event Action readyToEnterSignUpPassword;
-    public event Action signInWrongPassword;
-    public event Action signInPasswordValidated;
+    public event Action signInWrong;
+    public event Action<string, string> savePlayerProfile;
+    public event Action<string, string> checkSignIn;
+    public event Action<string> checkSignUpEmail;
+    public event Action<string> signUpEmailExisting;
+    public event Action authentificationFailed;
 
     void Awake()
     {
         startStop = new StartStop();
         uiEntryScene.stopButtonClick += StopGame;
-        uiEntryScene.onSignInEmailValidation += HandleSignInEmailInput;
-        uiEntryScene.onSignUpEmailValidation += HandleSignUpEmailInput;
-        uiEntryScene.onSignInPasswordInput += HandleSignInPasswordInput;
+
         uiEntryScene.signIn += HandleSignIn;
         uiEntryScene.signUp += HandleSignUp;
+        player.authentificationSuccessful += SignInAuthentification;
     }
 
-    private void HandleSignInEmailInput(string emailInput)
+    private void HandleSignIn(string email, string password)
     {
-        if (PlayerPrefs.GetString("playerEmail") == null || emailInput != PlayerPrefs.GetString("playerEmail"))
+        checkSignIn?.Invoke(email, password);
+    }
+
+    private void SignInAuthentification(bool successful)
+    {
+        if (successful)
         {
-            signInEmailDoesntMatch?.Invoke();
+            SceneManager.LoadScene("GameScene");
         }
         else
         {
-            readyToEnterSignInPassword?.Invoke();
+            authentificationFailed?.Invoke();
         }
-    }
-
-    private void HandleSignInPasswordInput(string passwordInput)
-    {
-        if (passwordInput != PlayerPrefs.GetString("playerPassword"))
-        {
-            signInWrongPassword?.Invoke();
-        }
-        else
-        {
-            signInPasswordValidated?.Invoke();
-        }
-    }
-
-    private void HandleSignUpEmailInput(string emailInput)
-    {
-        if (emailInput != PlayerPrefs.GetString("playerEmail"))
-        {
-            readyToEnterSignUpPassword?.Invoke();
-        }
-        else
-        {
-            signUpEmailDoesMatch?.Invoke();
-        }
-    }
-
-    private void HandleSignIn()
-    {
-        SceneManager.LoadScene("GameScene");
     }
 
     private void HandleSignUp(string email, string password)
     {
-        PlayerPrefs.SetString("playerEmail", email);
-        PlayerPrefs.SetString("playerPassword", password);
+        checkSignUpEmail?.Invoke(email);
+
+        savePlayerProfile?.Invoke(email, password);
+
         SceneManager.LoadScene("GameScene");
     }
 

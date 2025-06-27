@@ -1,16 +1,31 @@
 using UnityEngine;
+using System;
 
 public class YouLoseSceneManager : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    [SerializeField]
+    private CityDatabase cityDataBase;
+
+    [SerializeField]
+    private UIyouLoseScene uiYouLoseScene;
+    private Texture2D nowhereImage;
+
+    public event Action<Texture2D> getNowhereView;
+
     void Start()
     {
-        
+        getNowhereView?.Invoke(GetNowhereImage());
     }
 
-    // Update is called once per frame
-    void Update()
+    private Texture2D GetNowhereImage()
     {
-        
+        foreach (CityData city in cityDataBase.cities)
+        {
+            if (city.cityName == "Nullepart")
+            {
+                return nowhereImage = city.cityImage;
+            }
+        }
+        return null;
     }
 }

@@ -16,14 +16,14 @@ public class YouWinSceneManager : MonoBehaviour
 
     void Start()
     {
-        getCityView?.Invoke(GetArrivalCityImage(), Player.Instance.lastVisitedCity.ToUpper());
+        getCityView?.Invoke(GetArrivalCityImage(), Player.Instance.currentPlayer.lastVisitedCity.ToUpper());
     }
 
     private Texture2D GetArrivalCityImage()
     {
         foreach (CityData city in cityDataBase.cities)
         {
-            if (city.cityName.ToUpper() == Player.Instance.lastVisitedCity.ToUpper())
+            if (city.cityName.ToUpper() == Player.Instance.currentPlayer.lastVisitedCity.ToUpper())
             {
                 return arrivalCityImage = city.cityImage;
             }

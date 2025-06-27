@@ -31,10 +31,7 @@ public class UIentryScene : MonoBehaviour
 
     public event Action startButtonClick;
     public event Action stopButtonClick;
-    public event Action<string> onSignInEmailValidation;
-    public event Action<string> onSignUpEmailValidation;
-    public event Action<string> onSignInPasswordInput;
-    public event Action signIn;
+    public event Action<string, string> signIn;
     public event Action<string, string> signUp;
 
 
@@ -62,32 +59,8 @@ public class UIentryScene : MonoBehaviour
 
         autorisationPanel.style.display = DisplayStyle.None;
 
-        entrySceneManager.signInEmailDoesntMatch += HandleSingInEmailNotMatching;
         entrySceneManager.signUpEmailDoesMatch += HandleSingUpEmailMatching;
-        entrySceneManager.readyToEnterSignInPassword += () =>
-        {
-            signInPasswordInput.SetEnabled(true);
-            // signInPasswordInput.Focus();
-            signInWarning.text = "";
-        };
-        entrySceneManager.signInWrongPassword += () =>
-        {
-            if (signInPasswordInput.value != string.Empty && signInPasswordInput.value != "Votre mot de passe ...")
-            {
-                signInWarning.text = "Mot de passe incorrecte !";
-                signInButton.SetEnabled(false);
-            }
-            else
-            {
-                signInWarning.text = "";
-            }
-        };
-
-        entrySceneManager.signInPasswordValidated += () =>
-        {
-            signInButton.SetEnabled(true);
-            signInWarning.text = "";
-        };
+        entrySceneManager.authentificationFailed += OnAuthentificationFailed;
     }
 
     void OnEnable()
@@ -121,95 +94,75 @@ public class UIentryScene : MonoBehaviour
 
     private void InitializeElements()
     {
-        if (signInWarning != null) signInWarning.text = "";
-        // if (signInEmailInput != null) signInEmailInput.Focus();
-        if (signInPasswordInput != null) signInPasswordInput.SetEnabled(false);
-        if (signInButton != null) signInButton.SetEnabled(false);
-        if (signUpWarning != null) signUpWarning.text = "";
-        // if (signUpEmailInput != null) signUpEmailInput.Focus();
-        if (signUpPasswordInput != null) signUpPasswordInput.SetEnabled(false);
-        if (confirmPasswordInput != null) confirmPasswordInput.SetEnabled(false);
-        if (signUpButton != null) signUpButton.SetEnabled(false);
+        signInWarning.text = "";
+        signInButton.SetEnabled(false);
+        signUpWarning.text = "";
+        signUpButton.SetEnabled(false);
+        signInEmailInput.value = "Votre adresse email ...";
+        signInPasswordInput.value = "Votre mot de passe ...";
+        signUpEmailInput.value = "Votre adresse email ...";
+        signUpPasswordInput.value = "Votre mot de passe ...";
+        confirmPasswordInput.value = "Confirmez votre mot de passe ...";
     }
 
     private void OnSignInEmailValueChange()
     {
-        signInPasswordInput.value = "Votre mot de passe ...";
-        signInPasswordInput.SetEnabled(false);
-
         if (CheckEmail(signInEmailInput.value))
-        {
-            onSignInEmailValidation?.Invoke(signInEmailInput.value);
-        }
-        else if (!CheckEmail(signInEmailInput.value) && signInEmailInput.value != string.Empty && signInEmailInput.value != "Vorte adresse email ...")
-        {
-            signInWarning.text = "Une adresse email doit contenir @ et un point.";
-        }
-        else
         {
             signInWarning.text = "";
         }
-    }
-
-    private void HandleSingInEmailNotMatching()
-    {
-        signInPasswordInput.SetEnabled(false);
-        signInWarning.text = "Adresse email inconnue. Corrigez-là ou créez un nouveau compte.";
+        else
+        {
+            signInWarning.text = "Une adresse email doit contenir @ et un point.";
+        }
     }
 
     private void OnSignInPasswordValueChange()
     {
-        signUpPasswordInput.isPasswordField = true;
-        onSignInPasswordInput?.Invoke(signInPasswordInput.value);
+        if (signInPasswordInput.value != "" && signInPasswordInput.value != "Votre mot de passe ...")
+        {
+            signInButton.SetEnabled(true);
+        }
+        else
+        {
+            signInButton.SetEnabled(false);
+        }
     }
+
 
     private void OnSignUpEmailValueChange()
     {
-        signUpPasswordInput.value = "Votre mot de passe ...";
-        signUpPasswordInput.SetEnabled(false);
-
         if (CheckEmail(signUpEmailInput.value))
         {
-            onSignUpEmailValidation?.Invoke(signUpEmailInput.value);
-            signUpPasswordInput.SetEnabled(true);
+            signUpWarning.text = "";
         }
         else
         {
             signUpWarning.text = "Une adresse email doit contenir @ et un point.";
-            signUpPasswordInput.SetEnabled(false);
         }
     }
 
     private void HandleSingUpEmailMatching()
     {
-        signUpWarning.text = "Un compte associé à cette adresse email existe déjà.";
+        signUpWarning.text = "Un compte associé à cette adresse email existe déjà.\nConnectez-vous ou entrez une autre adresse email\npour créer un nouveau compte.";
     }
 
     private void OnSignUpPasswordValueChange()
     {
-        if (signUpPasswordInput.value != string.Empty && signUpPasswordInput.value != "Votre mot de passe ...")
-        {
-            confirmPasswordInput.SetEnabled(true);
-            confirmPasswordInput.value = "";
-        }
-        else
-        {
-            confirmPasswordInput.SetEnabled(false);
-        }
+        confirmPasswordInput.value = "";
     }
 
     private void OnConfirmPasswordValueChange()
     {
         if (signUpPasswordInput.value == confirmPasswordInput.value)
         {
+            confirmPasswordInput.style.color = new Color(0, 0, 0);
             signUpButton.SetEnabled(true);
-            signUpWarning.text = "Mot de passe confirmé";
-            signUpWarning.style.color = new Color(0, 0, 0);
         }
         else
         {
-            signUpWarning.text = "Confirmez le mot de passe.";
-            signUpWarning.style.color = new Color(1, 0, 0);
+            confirmPasswordInput.style.color = new Color(1, 0, 0);
+            signUpButton.SetEnabled(false);
         }
     }
 
@@ -240,7 +193,13 @@ public class UIentryScene : MonoBehaviour
 
     private void OnSignInButtonClick()
     {
-        signIn?.Invoke();
+        signIn?.Invoke(signInEmailInput.value, signInPasswordInput.value);
+    }
+
+    private void OnAuthentificationFailed()
+    {
+        signInButton.SetEnabled(false);
+        signInWarning.text = "Adresse email ou mot de passe incorrectes.\nCorrigez votre saisie ou créez un nouveau compte.";
     }
 
     private void OnSignUpButtonClick()

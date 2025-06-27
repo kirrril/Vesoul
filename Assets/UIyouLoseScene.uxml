@@ -1,12 +1,25 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Vesoul.uss?fileID=7433441132597879392&amp;guid=78101fb1290dfc740978c3aa540a1ffe&amp;type=3#Vesoul" />
     <ui:VisualElement name="background" style="flex-grow: 1; position: absolute; width: 100%; height: 100%; flex-shrink: 0;" />
-    <ui:VisualElement name="roadSign" style="flex-grow: 1; position: absolute; align-self: center; width: 100%; height: 100%; flex-shrink: 0;" />
-    <ui:VisualElement name="dashboard" style="flex-grow: 0; position: absolute; align-self: center; width: 100%; height: 100%; justify-content: flex-end; align-content: flex-end; flex-shrink: 0;">
-        <ui:VisualElement name="steeringWheel" style="flex-grow: 1; position: absolute; height: 40%; width: 33%; left: 20%; align-content: flex-end; justify-content: flex-end; align-items: flex-end;">
-            <ui:VisualElement name="startStop" style="flex-grow: 1; position: absolute; height: 100%; width: 30%; align-content: center; justify-content: center;">
-                <ui:Button text="Button" name="startButton" style="height: 50%;" />
-                <ui:Button text="Button" name="stopButton" style="height: 50%;" />
+    <ui:VisualElement name="roadSign" style="flex-grow: 1; position: absolute; align-self: center; width: 100%; height: 80%; flex-shrink: 0; flex-direction: row; justify-content: flex-end; align-content: flex-end; right: auto;">
+        <ui:VisualElement name="rightBoard" class="blackBoard" style="flex-grow: 0; width: 500px; padding-right: 30px; padding-left: 30px; height: 400px; justify-content: flex-start; top: 100px; flex-shrink: 0; background-color: rgb(0, 0, 0); white-space: normal; right: 250px;">
+            <ui:Label text="Comment" name="commentMessage" style="margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; top: 0;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement name="dashboard" style="flex-grow: 0; position: absolute; align-self: center; width: 100%; height: 450px; justify-content: flex-end; align-content: flex-end; flex-shrink: 0; bottom: 0; background-image: url(&quot;project://database/Assets/Img/DashboardBase.png?fileID=7009663376328020329&amp;guid=8c8cda00bd49247468ef04677b12c55f&amp;type=3#DashboardBase_0&quot;); -unity-background-scale-mode: stretch-to-fill; background-position-y: bottom 0; background-position-x: right 0; background-size: 100% 70%;">
+        <ui:VisualElement name="steeringWheel" style="flex-grow: 1; position: absolute; height: 400px; width: 1100px; left: 0; align-content: flex-end; justify-content: flex-end; align-items: flex-end; background-image: url(&quot;project://database/Assets/Img/SteeringWheel.png?fileID=-4464528053615996914&amp;guid=67fee8913d058ce40809c38fbff4cd8b&amp;type=3#SteeringWheel_0&quot;); -unity-background-scale-mode: scale-and-crop; background-position-x: right 0; background-position-y: bottom 0;">
+            <ui:VisualElement name="startStop" style="flex-grow: 1; position: absolute; height: 400px; width: 200px; align-content: center; justify-content: center;">
+                <ui:Button name="startButton" style="height: 200px; background-color: rgba(188, 188, 188, 0); background-image: url(&quot;project://database/Assets/Img/StartStop.png?fileID=-3092215582660001481&amp;guid=945c2a289b8e8904bbd10448f5c3a7a8&amp;type=3#StartButton&quot;); width: 200px;" />
+                <ui:Button name="stopButton" style="height: 200px; background-color: rgba(188, 188, 188, 0); background-image: url(&quot;project://database/Assets/Img/StartStop.png?fileID=1224154402505867584&amp;guid=945c2a289b8e8904bbd10448f5c3a7a8&amp;type=3#StopButton&quot;); width: 200px;" />
             </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="airBlowerLeft" style="flex-grow: 0; position: absolute; left: 0; width: 20%; height: 85%; top: auto; background-image: url(&quot;project://database/Assets/Img/AirBlowerLeft.png?fileID=-2080386289436306332&amp;guid=8878e4b3ed21344469e420a5feacb938&amp;type=3#AirBlowerLeft_0&quot;); -unity-background-scale-mode: scale-and-crop; background-position-x: left 0; background-size: 200px 230px; flex-shrink: 0; bottom: 35px;" />
+        <ui:VisualElement name="airBlowerRight" style="flex-grow: 0; position: absolute; left: auto; width: 20%; height: 85%; top: auto; background-image: url(&quot;project://database/Assets/Img/AirBlowerRight.png?fileID=2288012991731438895&amp;guid=47050109d8616fd4badce5219a76ef49&amp;type=3#AirBlowerRight_0&quot;); -unity-background-scale-mode: scale-and-crop; background-position-x: right 0; background-size: 200px 230px; flex-shrink: 0; right: 0; bottom: 35px;" />
+        <ui:VisualElement name="centralUnit" style="flex-grow: 1; position: absolute; width: 500px; height: 400px; align-self: auto; right: 20%;">
+            <ui:VisualElement name="speedControl" style="flex-grow: 1;">
+                <ui:ProgressBar value="5" name="remainingFuel" high-value="7" />
+            </ui:VisualElement>
+            <ui:VisualElement name="soundControl" style="flex-grow: 1;" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

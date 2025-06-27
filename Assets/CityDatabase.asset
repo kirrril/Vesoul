@@ -43,3 +43,6 @@ MonoBehaviour:
   - cityName: Carcassonne
     cityImage: {fileID: 2800000, guid: a0861ec84b7e0a34cb7b392d915d1a86, type: 3}
     alreadyVisited: 0
+  - cityName: Nullepart
+    cityImage: {fileID: 2800000, guid: 024aa067ff83c8449a59bbeff431a0e8, type: 3}
+    alreadyVisited: 0

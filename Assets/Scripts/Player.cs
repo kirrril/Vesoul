@@ -1,137 +1,175 @@
 using UnityEngine;
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using System.IO;
+using System;
+using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
     [SerializeField]
-    private GameSceneManager gameSceneManager;
-    public static Player Instance { get; private set; }
-
-    public PlayerProfile playerProfile;
-
-    private string playerEmail { get; set; }
-    private string playerPassword { get; set; }
-    public float experience { get; private set; }
-    public List<string> visitedCities { get; private set; } = new List<string>();
-    public int visitedCitiesCount { get; private set; }
-    public string lastVisitedCity { get; private set; }
-
+    private EntrySceneManager entrySceneManager;
+    public static Player Instance;
+    private PlayersRegistry playersRegistry;
+    public PlayerProfile currentPlayer { get; private set; }
+    public event Action<bool> emailDoesExist;
+    public event Action<bool> authentificationSuccessful;
 
     void Awake()
     {
-        if (Instance != null)
-        {
-            Destroy(gameObject);
-        }
-
         if (Instance == null)
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            LoadData();
+        }
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        entrySceneManager.checkSignIn += CheckSignIn;
+        entrySceneManager.checkSignUpEmail += CheckSignUpEmail;
+        entrySceneManager.savePlayerProfile += CreateNewPlayer;        
+    }
+
+    void Start()
+    {
+        CreatePlayersRegistry();
+    }
+
+    private void CreatePlayersRegistry()
+    {
+        string filePath = Application.persistentDataPath + $"/PlayersRegistry.json";
+        if (!File.Exists(filePath))
+        {
+            playersRegistry = new PlayersRegistry();
+            Debug.Log(filePath);
+            string registryInit = JsonUtility.ToJson(playersRegistry);
+            System.IO.File.WriteAllText(filePath, registryInit);
+        }
+        else
+        {
+            playersRegistry = JsonUtility.FromJson<PlayersRegistry>(System.IO.File.ReadAllText(filePath));
+
+            foreach (string mail in playersRegistry.playersList) Debug.Log(mail);
         }
     }
 
-    public void AddVisitedCity(string city)
+    private void CheckSignIn(string email, string password)
     {
-        visitedCities.Add(city);
-        visitedCitiesCount++;
-        lastVisitedCity = city;
-        IncreaseExperience();
-        SavePlayerData();
-    }
-
-    private void IncreaseExperience()
-    {
-        experience = visitedCities.Count / 10f;
-    }
-
-    private void SavePlayerData()
-    {
-        PlayerPrefs.SetInt("visitedCitiesCount", visitedCitiesCount);
-
-        for (int i = 0; i < visitedCitiesCount; i++)
+        if (playersRegistry.playersList.Contains(email.Replace("@", "_").Replace(".", "_")))
         {
-            PlayerPrefs.SetString($"visitedCity{i}", visitedCities[i]);
-        }
+            string filePath = Application.persistentDataPath + $"/{email.Replace("@", "_").Replace(".", "_")}.json";
+            string playerProfile = System.IO.File.ReadAllText(filePath);
+            currentPlayer = JsonUtility.FromJson<PlayerProfile>(playerProfile);
 
-        PlayerPrefs.SetFloat("playerExperience", experience);
-        PlayerPrefs.SetString("lastVisitedCity", lastVisitedCity);
-
-        PlayerPrefs.Save();
-    }
-
-    private void LoadData()
-    {
-        playerEmail = PlayerPrefs.GetString("playerEmail");
-        experience = PlayerPrefs.GetFloat("playerExperience", 0f);
-        visitedCitiesCount = PlayerPrefs.GetInt("visitedCitiesCount");
-
-        if (visitedCitiesCount != 0)
-        {
-            for (int i = 0; i < PlayerPrefs.GetInt("visitedCitiesCount"); i++)
+            if (currentPlayer.playerPassword == password)
             {
-                visitedCities.Add(PlayerPrefs.GetString($"visitedCity{i}"));
+                authentificationSuccessful?.Invoke(true);
+            }
+            else
+            {
+                authentificationSuccessful?.Invoke(false);
+            }
+        }
+        else
+        {
+            authentificationSuccessful?.Invoke(false);
+        }
+    }
+
+    private void CheckSignUpEmail(string email)
+    {
+        string filePath = Application.persistentDataPath + $"/PlayersRegistry.json";
+
+        foreach (string safeEmail in playersRegistry.playersList)
+        {
+            if (email.Replace("@", "_").Replace(".", "_") == safeEmail)
+            {
+                emailDoesExist?.Invoke(true);
             }
         }
     }
 
-    void OnApplicationQuit()
+    private void CreateNewPlayer(string email, string password)
     {
-        SavePlayerData();
+        string safeEmail = email.Replace("@", "_").Replace(".", "_");
+
+        SavePlayerProfile(safeEmail, password);
+        AddPlayerToRegistry(safeEmail);
     }
 
-    [ContextMenu("ClearPlayerPrefs")]
-    private void ClearPlayerPrefs()
+    public void SavePlayerProfile(string safeEmail, string password)
     {
-        for (int i = 0; i < visitedCitiesCount; i++)
-        {
-            PlayerPrefs.SetString($"visitedCity{i}", "");
-        }
-        PlayerPrefs.SetInt("visitedCitiesCount", 0);
-        PlayerPrefs.SetFloat("playerExperience", 0f);
-        PlayerPrefs.SetString("lastVisitedCity", string.Empty);
-        PlayerPrefs.SetString("playerPassword", string.Empty);
-        PlayerPrefs.SetString("playerEmail", string.Empty);
-    }
-
-    [ContextMenu("DebugPlayerPrefs")]
-    private void DebugPlayerPrefs()
-    {
-        for (int i = 0; i < visitedCitiesCount; i++)
-        {
-            Debug.Log(PlayerPrefs.GetString($"visitedCity{i}"));
-        }
-        Debug.Log(PlayerPrefs.GetInt("visitedCitiesCount"));
-        Debug.Log(PlayerPrefs.GetFloat("playerExperience"));
-        Debug.Log(PlayerPrefs.GetString("lastVisitedCity"));
-        Debug.Log(PlayerPrefs.GetString("playerPassword"));
-        Debug.Log(PlayerPrefs.GetString("playerEmail"));
-    }
-
-    public void SavePlayerToJson()
-    {
-        string playerData = JsonUtility.ToJson(playerProfile);
-        string filePath = Application.persistentDataPath + "/PlayerProfile.json";
+        currentPlayer = new PlayerProfile(safeEmail, password);
+        string newPlayer = JsonUtility.ToJson(currentPlayer);
+        string filePath = Application.persistentDataPath + $"/{safeEmail}.json";
         Debug.Log(filePath);
-        System.IO.File.WriteAllText(filePath, playerData);
+        System.IO.File.WriteAllText(filePath, newPlayer);
     }
-}
 
-[System.Serializable]
-public class PlayerProfile
-{
-    public string playerEmail;
-    public string playerPassword;
-    public float experience;
-    public List<string> visitedCities = new List<string>();
-    public int visitedCitiesCount;
-    public string lastVisitedCity;
-}
+    public void UpdatePlayerProfile()
+    {
+        string profileUpdate = JsonUtility.ToJson(currentPlayer);
+        string filePath = Application.persistentDataPath + $"/{currentPlayer.playerEmail.Replace("@", "_").Replace(".", "_")}.json";
+        System.IO.File.WriteAllText(filePath, profileUpdate);
+    }
 
-[System.Serializable]
-public class RegisteredPlayers
-{
-    public string playerEmail;
+    public void AddPlayerToRegistry(string safeEmail)
+    {
+        string filePath = Application.persistentDataPath + $"/PlayersRegistry.json";
+        playersRegistry.playersList.Add(safeEmail);
+
+        foreach (string mail in playersRegistry.playersList) Debug.Log(mail);
+
+        string registryUpdate = JsonUtility.ToJson(playersRegistry);
+        System.IO.File.WriteAllText(filePath, registryUpdate);
+    }
+
+    public void AddVisitedCity(string city)
+    {
+        currentPlayer.visitedCities.Add(city);
+        currentPlayer.visitedCitiesCount++;
+        currentPlayer.lastVisitedCity = city;
+        currentPlayer.experience = IncreaseExperience();
+        UpdatePlayerProfile();
+    }
+
+    private float IncreaseExperience()
+    {
+        return currentPlayer.visitedCities.Count / 10f;
+    }
+
+    [System.Serializable]
+    public class PlayerProfile
+    {
+        public string playerEmail;
+        public string playerPassword;
+        public float experience;
+        public List<string> visitedCities;
+        public int visitedCitiesCount;
+        public string lastVisitedCity;
+
+        public PlayerProfile(string email, string password)
+        {
+            playerEmail = email;
+            playerPassword = password;
+            experience = 0f;
+            visitedCities = new List<string>();
+            visitedCitiesCount = 0;
+            lastVisitedCity = string.Empty;
+        }
+    }
+
+    [System.Serializable]
+    public class PlayersRegistry
+    {
+        public List<string> playersList;
+
+        public PlayersRegistry()
+        {
+            playersList = new List<string>();
+        }
+    }
 }
