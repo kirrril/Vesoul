@@ -51,7 +51,7 @@ public class GameSceneManager : MonoBehaviour
         CommentUpdate?.Invoke("ENTREZ UNE LETTRE\nOU LE NOM DE LA VILLE EN ENTIER");
         FuelUpdate?.Invoke(remainingFuel);
 
-        Debug.Log(Player.Instance.currentPlayer.playerEmail);
+        // Debug.Log(Player.Instance.currentPlayer.playerEmail);
         Debug.Log(Player.Instance.currentPlayer.experience);
 
         foreach (string city in Player.Instance.currentPlayer.visitedCities)

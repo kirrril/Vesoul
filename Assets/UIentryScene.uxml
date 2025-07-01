@@ -12,28 +12,52 @@
         <ui:VisualElement name="airBlowerLeft" style="flex-grow: 0; position: absolute; left: 0; width: 20%; height: 85%; top: auto; background-image: url(&quot;project://database/Assets/Img/AirBlowerLeft.png?fileID=-2080386289436306332&amp;guid=8878e4b3ed21344469e420a5feacb938&amp;type=3#AirBlowerLeft_0&quot;); -unity-background-scale-mode: scale-and-crop; background-position-x: left 0; background-size: 200px 230px; flex-shrink: 0; bottom: 35px;" />
         <ui:VisualElement name="airBlowerRight" style="flex-grow: 0; position: absolute; left: auto; width: 20%; height: 85%; top: auto; background-image: url(&quot;project://database/Assets/Img/AirBlowerRight.png?fileID=2288012991731438895&amp;guid=47050109d8616fd4badce5219a76ef49&amp;type=3#AirBlowerRight_0&quot;); -unity-background-scale-mode: scale-and-crop; background-position-x: right 0; background-size: 200px 230px; flex-shrink: 0; right: 0; bottom: 35px;" />
     </ui:VisualElement>
-    <ui:VisualElement name="autorisationPanel" class="textField" style="flex-grow: 1; justify-content: center; align-content: center; align-items: center;">
-        <ui:VisualElement name="autorisationForm" style="flex-grow: 1; position: absolute; width: 900px; height: 600px; padding-left: 50px; padding-right: 50px; align-content: center; justify-content: center;">
-            <ui:TabView name="tabView" style="background-size: 100% 100%; height: 400px;">
-                <ui:Tab label="SE CONNECTER" tabindex="0" name="seConnecterTab" style="height: 400px;">
-                    <ui:Label text="Warning" name="signInWarning" style="height: 60px; margin-top: 20px; margin-right: 0; margin-bottom: 20px; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
-                    <ui:TextField label="E-mail" placeholder-text="Votre adresse email ..." name="signInEmailInput" readonly="false" class="inputField" style="margin-top: 10px; margin-bottom: 10px; margin-right: 0; margin-left: 0;" />
-                    <ui:TextField label="Password" placeholder-text="Votre mot de passe ..." name="signInPasswordInput" password="false" class="inputField" style="margin-top: 10px; margin-bottom: 10px; margin-right: 0; margin-left: 0;" />
-                    <ui:VisualElement name="buttonContainer" style="flex-grow: 0; flex-shrink: 0; justify-content: center; height: 100px; flex-direction: row; align-items: center;">
-                        <ui:Button text="Se connecter" name="signInButton" style="width: 200px; height: 50px; margin-right: 0; margin-left: 0; position: absolute; right: 0; margin-top: 0; margin-bottom: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
-                    </ui:VisualElement>
-                </ui:Tab>
-                <ui:Tab label="CRÉER UN COMPTE" tabindex="0" name="creerCompteTab" style="height: 400px;">
-                    <ui:Label text="Warning" name="signUpWarning" style="height: 60px; margin-top: 20px; margin-right: 0; margin-bottom: 20px; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
-                    <ui:TextField label="E-mail" placeholder-text="Votre adresse email ..." name="signUpEmailInput" readonly="false" style="margin-top: 10px; margin-right: 0; margin-bottom: 10px; margin-left: 0;" />
-                    <ui:TextField label="Password" placeholder-text="Votre mot de passe ..." name="signUpPasswordInput" style="margin-top: 10px; margin-right: 0; margin-bottom: 10px; margin-left: 0;" />
-                    <ui:TextField label="Confirm Password" placeholder-text="Confirmez votre mot de passe ..." name="confirmPasswordInput" style="margin-top: 10px; margin-right: 0; margin-bottom: 10px; margin-left: 0;" />
-                    <ui:VisualElement name="buttonContainer" style="flex-grow: 0; flex-shrink: 0; justify-content: center; height: 100px; flex-direction: row; align-items: center;">
-                        <ui:Button text="Créer un compte" name="signUpButton" style="width: 200px; height: 50px; margin-right: 0; margin-left: 0; position: absolute; right: 0; margin-top: 0; margin-bottom: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
-                    </ui:VisualElement>
-                </ui:Tab>
-            </ui:TabView>
+    <ui:VisualElement name="autorisationPanel" class="textField" style="flex-grow: 1; justify-content: center; align-content: center; align-items: center; background-color: rgb(16, 77, 125);">
+        <ui:VisualElement name="autorisationForm" style="flex-grow: 0; position: absolute; width: 70%; height: 90%; padding-left: 100px; padding-right: 100px; align-content: center; justify-content: flex-start; background-image: url(&quot;project://database/Assets/Sprites/Permis.png?fileID=6259045867735737351&amp;guid=a2a1df4fe19ff744fb55b3bfe505149a&amp;type=3#Permis_0&quot;); flex-shrink: 0;">
+            <ui:VisualElement name="permisContainer" style="flex-grow: 0; flex-direction: row; align-items: center; flex-shrink: 0; height: 25%;">
+                <ui:VisualElement name="permisLeft" style="flex-grow: 1; width: 15%; background-image: url(&quot;project://database/Assets/Sprites/F.png?fileID=-3687348052613884379&amp;guid=4f709721d8ca751469794242ed65a1f0&amp;type=3#F_0&quot;); height: 40%; -unity-background-scale-mode: scale-and-crop;" />
+                <ui:VisualElement name="permisRight" style="flex-grow: 1; width: 85%; -unity-text-align: upper-right;">
+                    <ui:Label text="PERMIS DE CONDUIRE" name="permisDeConduire" class="plainText" style="height: auto; -unity-text-align: middle-right; font-size: 80%; letter-spacing: 15px; -unity-font-style: bold; color: rgb(255, 255, 255); flex-grow: 0;" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="formContainer" style="flex-grow: 1;">
+                <ui:TabView name="tabView" class="plainText" style="background-size: 100% 100%; height: 400px;">
+                    <ui:Tab label="SE CONNECTER" tabindex="0" name="seConnecterTab" class="plainText" style="height: 400px; background-color: rgb(255, 255, 255);">
+                        <ui:Label text="Warning" name="signInUsernameWarning" class="plainText" style="height: 40px; margin-top: 30px; margin-right: 0; margin-bottom: 30px; margin-left: 0; padding-top: 0; padding-right: 50px; padding-bottom: 0; padding-left: 50px;" />
+                        <ui:VisualElement name="usernameContainer" style="flex-grow: 0; height: 100px; margin-top: 0; margin-bottom: 0; flex-shrink: 0; flex-direction: row;">
+                            <ui:VisualElement name="leftContainer" style="flex-grow: 0; flex-shrink: 0; width: 25%; align-self: auto; justify-content: center; padding-right: 50px; padding-left: 50px;">
+                                <ui:Label text="VOTRE NOM" name="usernameLabel" />
+                            </ui:VisualElement>
+                            <ui:VisualElement name="rightContainer" style="flex-grow: 0; width: 75%; flex-shrink: 0; padding-right: 50px; justify-content: center;">
+                                <ui:TextField name="signInUsernameInput" readonly="false" password="false" class="inputField" style="margin-top: 10px; margin-bottom: 10px; margin-right: 0; margin-left: 0;" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                        <ui:Label text="Warning" name="signInPasswordWarning" class="plainText" style="height: 40px; margin-top: 30px; margin-right: 0; margin-bottom: 30px; margin-left: 0; padding-top: 0; padding-right: 50px; padding-bottom: 0; padding-left: 50px;" />
+                        <ui:VisualElement name="passwordContainer" style="flex-grow: 0; flex-shrink: 0; height: 100px; background-color: rgb(255, 255, 255); flex-direction: row;">
+                            <ui:VisualElement name="leftContainer" style="flex-grow: 0; flex-shrink: 0; width: 25%; justify-content: center; padding-right: 50px; padding-left: 50px;">
+                                <ui:Label text="MOT DE PASSE" name="motDePasseLabel" />
+                            </ui:VisualElement>
+                            <ui:VisualElement name="rightContainer" style="flex-grow: 0; flex-shrink: 0; width: 75%; padding-right: 50px; justify-content: center;">
+                                <ui:TextField placeholder-text="Votre mot de passe" name="signInPasswordInput" password="true" readonly="false" class="inputField" style="margin-top: 10px; margin-bottom: 10px; margin-right: 0; margin-left: 0;" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                        <ui:VisualElement name="buttonContainer" style="flex-grow: 0; flex-shrink: 0; justify-content: center; height: 200px; flex-direction: row; align-items: center; position: relative; width: 100%; bottom: auto; align-self: auto; -unity-text-align: upper-left; background-position-y: center 0; top: auto; margin-top: 0; padding-right: 0;">
+                            <ui:Button text="SE CONNECTER" name="signInButton" style="width: 300px; height: 70px; margin-right: 50px; margin-left: 0; position: absolute; right: 0; margin-top: 0; margin-bottom: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0;" />
+                        </ui:VisualElement>
+                    </ui:Tab>
+                    <ui:Tab label="CRÉER UN COMPTE" tabindex="0" name="creerCompteTab" style="height: 400px; background-color: rgb(255, 255, 255);">
+                        <ui:Label text="Warning" name="signUpUsernameWarning" style="height: 40px; margin-top: 20px; margin-right: 0; margin-bottom: 20px; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+                        <ui:TextField label="VOTRE NOM" placeholder-text="Votre adresse email ..." name="signUpUsernameInput" readonly="false" style="margin-top: 10px; margin-right: 0; margin-bottom: 10px; margin-left: 0;" />
+                        <ui:Label text="Warning" name="signUpPasswordWarning" style="height: 40px; margin-top: 20px; margin-right: 0; margin-bottom: 20px; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+                        <ui:TextField label="MOT DE PASSE" placeholder-text="Votre mot de passe" name="signUpPasswordInput" password="true" style="margin-top: 10px; margin-right: 0; margin-bottom: 10px; margin-left: 0;" />
+                        <ui:TextField label="CONFIRMEZ" placeholder-text="Votre mot de passe" name="confirmPasswordInput" password="true" readonly="false" style="margin-top: 10px; margin-right: 0; margin-bottom: 10px; margin-left: 0;" />
+                        <ui:VisualElement name="buttonContainer" style="flex-grow: 0; flex-shrink: 0; justify-content: center; height: 100px; flex-direction: row; align-items: center;">
+                            <ui:Button text="Créer un compte" name="signUpButton" style="width: 200px; height: 50px; margin-right: 0; margin-left: 0; position: absolute; right: 0; margin-top: 0; margin-bottom: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+                        </ui:VisualElement>
+                    </ui:Tab>
+                </ui:TabView>
+            </ui:VisualElement>
         </ui:VisualElement>
-        <ui:Button text="EXIT" name="exitButton" style="position: absolute; top: 50px; right: 50px;" />
+        <ui:Button name="exitButton" style="position: absolute; top: 50px; right: 50px; width: 80px; height: 80px; background-color: rgba(188, 188, 188, 0); border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; background-image: url(&quot;project://database/Assets/Sprites/CloseForm.png?fileID=239356048812284395&amp;guid=3b226c63b6632d34eb966882c3fda2fb&amp;type=3#CloseForm_0&quot;);" />
     </ui:VisualElement>
 </ui:UXML>

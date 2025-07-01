@@ -36,3 +36,7 @@
     border-bottom-width: 15px;
     border-left-width: 15px;
 }
+
+.plainText {
+    font-size: 30px;
+}

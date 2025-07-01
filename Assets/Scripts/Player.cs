@@ -4,16 +4,21 @@ using JetBrains.Annotations;
 using System.IO;
 using System;
 using UnityEngine.SceneManagement;
+using Unity.Services.Authentication;
+using Unity.Services.CloudSave;
+using Unity.Services.Core;
+using System.Threading.Tasks;
+using Unity.VisualScripting;
 
 public class Player : MonoBehaviour
 {
     [SerializeField]
     private EntrySceneManager entrySceneManager;
     public static Player Instance;
-    private PlayersRegistry playersRegistry;
     public PlayerProfile currentPlayer { get; private set; }
-    public event Action<bool> emailDoesExist;
-    public event Action<bool> authentificationSuccessful;
+    private bool cloudConnected;
+
+    public event Action<string> errorWarning;
 
     void Awake()
     {
@@ -27,113 +32,140 @@ public class Player : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-
-        entrySceneManager.checkSignIn += CheckSignIn;
-        entrySceneManager.checkSignUpEmail += CheckSignUpEmail;
-        entrySceneManager.savePlayerProfile += CreateNewPlayer;        
     }
 
     void Start()
     {
-        CreatePlayersRegistry();
+        CloudInitListenEvents();
     }
 
-    private void CreatePlayersRegistry()
+    async void CloudInitListenEvents()
     {
-        string filePath = Application.persistentDataPath + $"/PlayersRegistry.json";
-        if (!File.Exists(filePath))
-        {
-            playersRegistry = new PlayersRegistry();
-            Debug.Log(filePath);
-            string registryInit = JsonUtility.ToJson(playersRegistry);
-            System.IO.File.WriteAllText(filePath, registryInit);
-        }
-        else
-        {
-            playersRegistry = JsonUtility.FromJson<PlayersRegistry>(System.IO.File.ReadAllText(filePath));
+        await InitializeCloudAsync();
 
-            foreach (string mail in playersRegistry.playersList) Debug.Log(mail);
+        if (cloudConnected)
+        {
+            entrySceneManager.trySignIn += HandleSignIn;
+            entrySceneManager.trySignUp += HandleSignUp;
         }
     }
 
-    private void CheckSignIn(string email, string password)
+    async Task InitializeCloudAsync()
     {
-        if (playersRegistry.playersList.Contains(email.Replace("@", "_").Replace(".", "_")))
+        try
         {
-            string filePath = Application.persistentDataPath + $"/{email.Replace("@", "_").Replace(".", "_")}.json";
-            string playerProfile = System.IO.File.ReadAllText(filePath);
-            currentPlayer = JsonUtility.FromJson<PlayerProfile>(playerProfile);
+            await UnityServices.InitializeAsync();
 
-            if (currentPlayer.playerPassword == password)
+            cloudConnected = true;
+        }
+        catch (Exception e)
+        {
+            cloudConnected = false;
+            errorWarning?.Invoke("La connexion a échoué, vérifiez votre connextion Internet");
+            Debug.LogException(e);
+        }
+    }
+
+    private async void HandleSignIn(string username, string password)
+    {
+        await SignInWithUsernamePasswordAsync(username, password);
+    }
+
+    async Task SignInWithUsernamePasswordAsync(string username, string password)
+    {
+        try
+        {
+            await AuthenticationService.Instance.SignInWithUsernamePasswordAsync(username, password);
+            Debug.Log("SignIn is successful.");
+
+            await LoadPlayerStartGame(username);
+        }
+        catch (AuthenticationException ex)
+        {
+            string fullMessage = ex.ToString();
+            Debug.LogError(fullMessage);
+
+            if (fullMessage.Contains("WRONG_USERNAME_PASSWORD") || fullMessage.Contains("Invalid username or password"))
             {
-                authentificationSuccessful?.Invoke(true);
+                errorWarning?.Invoke("L'identifiant ou le mot de passe est incorrect.");
             }
             else
             {
-                authentificationSuccessful?.Invoke(false);
+                errorWarning?.Invoke("Erreur d'authentification.");
             }
+        }
+        catch (RequestFailedException ex)
+        {
+            Debug.LogException(ex);
+            errorWarning?.Invoke("L'identifiant ou le mot de passe inconnu.\nCorrigez votre saisie ou créez un nouveau compte.");
+        }
+    }
+
+    private async Task LoadPlayerStartGame(string username)
+    {
+        var keys = new HashSet<string> { "playerUsername", "experience", "visitedCities", "visitedCitiesCount", "lastVisitedCity" };
+        var cloudData = await CloudSaveService.Instance.Data.Player.LoadAsync(keys);
+
+        cloudData.TryGetValue("playerUsername", out var usernameObj);
+        string loadedUsername = usernameObj.Value.GetAs<string>();
+
+        if (username == loadedUsername)
+        {
+            currentPlayer = new PlayerProfile(loadedUsername);
+            cloudData.TryGetValue("experience", out var experienceObj);
+            currentPlayer.experience = experienceObj.Value.GetAs<float>();
+            cloudData.TryGetValue("visitedCities", out var visitedCitiesObj);
+            currentPlayer.visitedCities = visitedCitiesObj.Value.GetAs<List<string>>();
+            cloudData.TryGetValue("visitedCitiesCount", out var visitedCitiesCountObj);
+            currentPlayer.visitedCitiesCount = visitedCitiesCountObj.Value.GetAs<int>();
+            cloudData.TryGetValue("lastVisitedCity", out var lastVisitedCityObj);
+            currentPlayer.lastVisitedCity = lastVisitedCityObj.Value.GetAs<string>();
+
+            SceneManager.LoadScene("GameScene");
         }
         else
         {
-            authentificationSuccessful?.Invoke(false);
+            errorWarning?.Invoke("L'identifiant ou le mot de passe incorrects");
         }
     }
 
-    private void CheckSignUpEmail(string email)
-    {
-        string filePath = Application.persistentDataPath + $"/PlayersRegistry.json";
 
-        foreach (string safeEmail in playersRegistry.playersList)
+
+    private async void HandleSignUp(string username, string password)
+    {
+        await SignUpWithUsernamePasswordAsync(username, password);
+    }
+
+    async Task SignUpWithUsernamePasswordAsync(string username, string password)
+    {
+        try
         {
-            if (email.Replace("@", "_").Replace(".", "_") == safeEmail)
-            {
-                emailDoesExist?.Invoke(true);
-            }
+            await AuthenticationService.Instance.SignUpWithUsernamePasswordAsync(username, password);
+            Debug.Log("SignUp is successful.");
+
+            await CreatePlayerStartGame(username);
+        }
+        catch (AuthenticationException ex)
+        {
+            errorWarning?.Invoke("L'identifiant n'est pas disponible pour la création d'un nouveau compte");
+            Debug.LogException(ex);
+        }
+        catch (RequestFailedException ex)
+        {
+
+            errorWarning?.Invoke("L'identifiant n'est pas disponible pour la création d'un nouveau compte");
+            Debug.LogException(ex);
         }
     }
 
-    private void CreateNewPlayer(string email, string password)
-    {
-        string safeEmail = email.Replace("@", "_").Replace(".", "_");
-
-        SavePlayerProfile(safeEmail, password);
-        AddPlayerToRegistry(safeEmail);
-    }
-
-    public void SavePlayerProfile(string safeEmail, string password)
-    {
-        currentPlayer = new PlayerProfile(safeEmail, password);
-        string newPlayer = JsonUtility.ToJson(currentPlayer);
-        string filePath = Application.persistentDataPath + $"/{safeEmail}.json";
-        Debug.Log(filePath);
-        System.IO.File.WriteAllText(filePath, newPlayer);
-    }
-
-    public void UpdatePlayerProfile()
-    {
-        string profileUpdate = JsonUtility.ToJson(currentPlayer);
-        string filePath = Application.persistentDataPath + $"/{currentPlayer.playerEmail.Replace("@", "_").Replace(".", "_")}.json";
-        System.IO.File.WriteAllText(filePath, profileUpdate);
-    }
-
-    public void AddPlayerToRegistry(string safeEmail)
-    {
-        string filePath = Application.persistentDataPath + $"/PlayersRegistry.json";
-        playersRegistry.playersList.Add(safeEmail);
-
-        foreach (string mail in playersRegistry.playersList) Debug.Log(mail);
-
-        string registryUpdate = JsonUtility.ToJson(playersRegistry);
-        System.IO.File.WriteAllText(filePath, registryUpdate);
-    }
-
-    public void AddVisitedCity(string city)
+    public async Task AddVisitedCity(string city)
     {
         currentPlayer.visitedCities.Add(city);
         currentPlayer.visitedCitiesCount++;
         currentPlayer.lastVisitedCity = city;
         currentPlayer.experience = IncreaseExperience();
-        UpdatePlayerProfile();
+
+        await SaveData();
     }
 
     private float IncreaseExperience()
@@ -141,35 +173,52 @@ public class Player : MonoBehaviour
         return currentPlayer.visitedCities.Count / 10f;
     }
 
+    private async Task CreatePlayerStartGame(string username)
+    {
+        currentPlayer = new PlayerProfile(username);
+
+        await SaveData();
+
+        SceneManager.LoadScene("GameScene");
+    }
+
+    public async Task SaveData()
+    {
+        var playerData = new Dictionary<string, object>
+        {
+            {"playerUsername", currentPlayer.playerUsername},
+            {"experience", currentPlayer.experience},
+            {"visitedCities", currentPlayer.visitedCities},
+            {"visitedCitiesCount", currentPlayer.visitedCitiesCount},
+            {"lastVisitedCity", currentPlayer.lastVisitedCity}
+        };
+
+        await CloudSaveService.Instance.Data.Player.SaveAsync(playerData);
+        Debug.Log($"Saved data {string.Join(',', playerData)}");
+    }
+
+    private async Task OnApplicationQuit()
+    {
+        await SaveData();
+    }
+
+
     [System.Serializable]
     public class PlayerProfile
     {
-        public string playerEmail;
-        public string playerPassword;
+        public string playerUsername;
         public float experience;
         public List<string> visitedCities;
         public int visitedCitiesCount;
         public string lastVisitedCity;
 
-        public PlayerProfile(string email, string password)
+        public PlayerProfile(string username)
         {
-            playerEmail = email;
-            playerPassword = password;
+            playerUsername = username;
             experience = 0f;
             visitedCities = new List<string>();
             visitedCitiesCount = 0;
             lastVisitedCity = string.Empty;
-        }
-    }
-
-    [System.Serializable]
-    public class PlayersRegistry
-    {
-        public List<string> playersList;
-
-        public PlayersRegistry()
-        {
-            playersList = new List<string>();
         }
     }
 }

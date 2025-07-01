@@ -7,52 +7,40 @@ public class EntrySceneManager : MonoBehaviour
 {
     [SerializeField]
     private UIentryScene uiEntryScene;
-    [SerializeField]
-    private Player player;
+
     public StartStop startStop;
 
-    public event Action signUpEmailDoesMatch;
-    public event Action signInWrong;
-    public event Action<string, string> savePlayerProfile;
-    public event Action<string, string> checkSignIn;
-    public event Action<string> checkSignUpEmail;
-    public event Action<string> signUpEmailExisting;
-    public event Action authentificationFailed;
+    public event Action<string, string> trySignIn;
+    public event Action<string, string> trySignUp;
+    public event Action<string> displaySignInError;
 
     void Awake()
     {
         startStop = new StartStop();
         uiEntryScene.stopButtonClick += StopGame;
 
-        uiEntryScene.signIn += HandleSignIn;
-        uiEntryScene.signUp += HandleSignUp;
-        player.authentificationSuccessful += SignInAuthentification;
+        uiEntryScene.signInButtonClick += HandleSignIn;
+        uiEntryScene.signUpButtonClick += HandleSignUp;
+    }
+
+    void Start()
+    {
+        Player.Instance.errorWarning += HandleSignInError;
     }
 
     private void HandleSignIn(string email, string password)
     {
-        checkSignIn?.Invoke(email, password);
-    }
-
-    private void SignInAuthentification(bool successful)
-    {
-        if (successful)
-        {
-            SceneManager.LoadScene("GameScene");
-        }
-        else
-        {
-            authentificationFailed?.Invoke();
-        }
+        trySignIn?.Invoke(email, password);
     }
 
     private void HandleSignUp(string email, string password)
     {
-        checkSignUpEmail?.Invoke(email);
+        trySignUp?.Invoke(email, password);
+    }
 
-        savePlayerProfile?.Invoke(email, password);
-
-        SceneManager.LoadScene("GameScene");
+    private void HandleSignInError(string errorMessage)
+    {
+        displaySignInError?.Invoke(errorMessage);
     }
 
     private void StopGame()

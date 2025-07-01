@@ -18,21 +18,22 @@ public class UIentryScene : MonoBehaviour
     private Label signUpTabLabel;
     private TabView tabView;
     private VisualElement autorisationPanel;
-    private Label signInWarning;
-    private Label signUpWarning;
-    private TextField signInEmailInput;
-    private TextField signUpEmailInput;
+    private Label signInUsernameWarning;
+    private Label signUpUsernameWarning;
+    private Label signInPasswordWarning;
+    private Label signUpPasswordWarning;
+    private TextField signInUsernameInput;
+    private TextField signUpUsernameInput;
     private TextField signInPasswordInput;
     private TextField signUpPasswordInput;
     private TextField confirmPasswordInput;
     private Button signInButton;
     private Button signUpButton;
     private Button exitButton;
-
     public event Action startButtonClick;
     public event Action stopButtonClick;
-    public event Action<string, string> signIn;
-    public event Action<string, string> signUp;
+    public event Action<string, string> signInButtonClick;
+    public event Action<string, string> signUpButtonClick;
 
 
     void Awake()
@@ -46,10 +47,12 @@ public class UIentryScene : MonoBehaviour
         signInTab = root.Q<Tab>("seConnecterTab");
         signInTabLabel = signInTab.Q<Label>();
         signUpTab = root.Q<Tab>("creerCompteTab");
-        signInWarning = root.Q<Label>("signInWarning");
-        signUpWarning = root.Q<Label>("signUpWarning");
-        signInEmailInput = root.Q<TextField>("signInEmailInput");
-        signUpEmailInput = root.Q<TextField>("signUpEmailInput");
+        signInUsernameWarning = root.Q<Label>("signInUsernameWarning");
+        signUpUsernameWarning = root.Q<Label>("signUpUsernameWarning");
+        signInPasswordWarning = root.Q<Label>("signInPasswordWarning");
+        signUpPasswordWarning = root.Q<Label>("signUpPasswordWarning");
+        signInUsernameInput = root.Q<TextField>("signInUsernameInput");
+        signUpUsernameInput = root.Q<TextField>("signUpUsernameInput");
         signInPasswordInput = root.Q<TextField>("signInPasswordInput");
         signUpPasswordInput = root.Q<TextField>("signUpPasswordInput");
         confirmPasswordInput = root.Q<TextField>("confirmPasswordInput");
@@ -58,9 +61,7 @@ public class UIentryScene : MonoBehaviour
         exitButton = root.Q<Button>("exitButton");
 
         autorisationPanel.style.display = DisplayStyle.None;
-
-        entrySceneManager.signUpEmailDoesMatch += HandleSingUpEmailMatching;
-        entrySceneManager.authentificationFailed += OnAuthentificationFailed;
+        entrySceneManager.displaySignInError += DisplaySignInError;
     }
 
     void OnEnable()
@@ -68,10 +69,10 @@ public class UIentryScene : MonoBehaviour
         startButton.RegisterCallback<ClickEvent>(evt => OnStartButtonClick());
         stopButton.RegisterCallback<ClickEvent>(evt => OnStopButtonClick());
         exitButton.RegisterCallback<ClickEvent>(evt => OnExitButtonClick());
-        signInEmailInput.RegisterValueChangedCallback(evt => OnSignInEmailValueChange());
+        signInUsernameInput.RegisterValueChangedCallback(evt => OnSignInUsernameValueChange());
         signInPasswordInput.RegisterValueChangedCallback(evt => OnSignInPasswordValueChange());
         signInButton.RegisterCallback<ClickEvent>(evt => OnSignInButtonClick());
-        signUpEmailInput.RegisterValueChangedCallback(evt => OnSignUpEmailValueChange());
+        signUpUsernameInput.RegisterValueChangedCallback(evt => OnSignUpUsernameValueChange());
         signUpPasswordInput.RegisterValueChangedCallback(evt => OnSignUpPasswordValueChange());
         confirmPasswordInput.RegisterValueChangedCallback(evt => OnConfirmPasswordValueChange());
         signUpButton.RegisterCallback<ClickEvent>(evt => OnSignUpButtonClick());
@@ -83,10 +84,10 @@ public class UIentryScene : MonoBehaviour
         startButton.UnregisterCallback<ClickEvent>(evt => OnStartButtonClick());
         stopButton.UnregisterCallback<ClickEvent>(evt => OnStopButtonClick());
         exitButton.UnregisterCallback<ClickEvent>(evt => OnExitButtonClick());
-        signInEmailInput.UnregisterValueChangedCallback(evt => OnSignInEmailValueChange());
+        signInUsernameInput.UnregisterValueChangedCallback(evt => OnSignInUsernameValueChange());
         signInPasswordInput.UnregisterValueChangedCallback(evt => OnSignInPasswordValueChange());
         signInButton.UnregisterCallback<ClickEvent>(evt => OnSignInButtonClick());
-        signUpEmailInput.UnregisterValueChangedCallback(evt => OnSignUpEmailValueChange());
+        signUpUsernameInput.UnregisterValueChangedCallback(evt => OnSignUpUsernameValueChange());
         signUpPasswordInput.UnregisterValueChangedCallback(evt => OnSignUpPasswordValueChange());
         confirmPasswordInput.UnregisterValueChangedCallback(evt => OnConfirmPasswordValueChange());
         signUpButton.UnregisterCallback<ClickEvent>(evt => OnSignUpButtonClick());
@@ -94,82 +95,95 @@ public class UIentryScene : MonoBehaviour
 
     private void InitializeElements()
     {
-        signInWarning.text = "";
+        signInUsernameWarning.text = "Le nom doit contenir de 3 à 20 lettres A-Z et a-z,\ndes chiffres et des symbols « . », « - », « @ » and « _ »";
+        signInPasswordWarning.text = "Le mot de passe doit contenir entre 8 et 30 lettres, au moins une minuscule, une majuscule, un chiffre et un symbole";
         signInButton.SetEnabled(false);
-        signUpWarning.text = "";
+        signUpUsernameWarning.text = "Le nom doit contenir de 3 à 20 lettres A-Z et a-z,\ndes chiffres et des symbols « . », « - », « @ » and « _ »";
+        signUpPasswordWarning.text = "Le mot de passe doit contenir entre 8 et 30 lettres, au moins une minuscule, une majuscule, un chiffre et un symbole";
         signUpButton.SetEnabled(false);
-        signInEmailInput.value = "Votre adresse email ...";
-        signInPasswordInput.value = "Votre mot de passe ...";
-        signUpEmailInput.value = "Votre adresse email ...";
-        signUpPasswordInput.value = "Votre mot de passe ...";
-        confirmPasswordInput.value = "Confirmez votre mot de passe ...";
     }
 
-    private void OnSignInEmailValueChange()
+    private void OnSignInUsernameValueChange()
     {
-        if (CheckEmail(signInEmailInput.value))
+        if (CheckUsername(signInUsernameInput.value))
         {
-            signInWarning.text = "";
+            signInUsernameWarning.text = "Le nom d'utilisateur conforme";
         }
         else
         {
-            signInWarning.text = "Une adresse email doit contenir @ et un point.";
+            signInUsernameWarning.text = "Le nom doit contenir de 3 à 20 lettres A-Z et a-z,\ndes chiffres et des symbols « . », « - », « @ » and « _ »";
         }
     }
 
     private void OnSignInPasswordValueChange()
     {
-        if (signInPasswordInput.value != "" && signInPasswordInput.value != "Votre mot de passe ...")
+        if (CheckPassword(signInPasswordInput.value))
         {
+            signInPasswordWarning.text = "Le mot de passe conforme";
             signInButton.SetEnabled(true);
         }
         else
         {
+            signInPasswordWarning.text = "Le mot de passe doit contenir entre 8 et 30 lettres, au moins une minuscule, une majuscule, un chiffre et un symbole";
             signInButton.SetEnabled(false);
         }
     }
 
 
-    private void OnSignUpEmailValueChange()
+    private void OnSignUpUsernameValueChange()
     {
-        if (CheckEmail(signUpEmailInput.value))
+        if (CheckUsername(signUpUsernameInput.value))
         {
-            signUpWarning.text = "";
+            signUpUsernameWarning.text = "Le nom d'utilisateur conforme";
         }
         else
         {
-            signUpWarning.text = "Une adresse email doit contenir @ et un point.";
+            signUpUsernameWarning.text = "Le nom doit contenir de 3 à 20 lettres A-Z et a-z,\ndes chiffres et des symbols « . », « - », « @ » and « _ »";
         }
     }
 
-    private void HandleSingUpEmailMatching()
+    private void HandleSingUpUsernameMatching()
     {
-        signUpWarning.text = "Un compte associé à cette adresse email existe déjà.\nConnectez-vous ou entrez une autre adresse email\npour créer un nouveau compte.";
+        signUpUsernameWarning.text = "Un compte associé à cette adresse email existe déjà.\nConnectez-vous ou entrez une autre adresse email\npour créer un nouveau compte.";
     }
 
     private void OnSignUpPasswordValueChange()
     {
+        if (CheckPassword(signUpPasswordInput.value))
+        {
+            signUpPasswordWarning.text = "Mot de passe conforme";
+        }
+        else
+        {
+            signUpPasswordWarning.text = "Le mot de passe doit contenir entre 8 et 30 lettres, au moins une minuscule, une majuscule, un chiffre et un symbole";
+        }
         confirmPasswordInput.value = "";
     }
 
     private void OnConfirmPasswordValueChange()
     {
-        if (signUpPasswordInput.value == confirmPasswordInput.value)
-        {
-            confirmPasswordInput.style.color = new Color(0, 0, 0);
-            signUpButton.SetEnabled(true);
-        }
-        else
+        if (confirmPasswordInput.value != "" && signUpPasswordInput.value != confirmPasswordInput.value)
         {
             confirmPasswordInput.style.color = new Color(1, 0, 0);
             signUpButton.SetEnabled(false);
         }
+        else
+        {
+            confirmPasswordInput.style.color = new Color(0, 0, 0);
+            signUpButton.SetEnabled(true);
+        }
     }
 
-    private bool CheckEmail(string emailFieldValue)
+    private bool CheckUsername(string usernameFieldValue)
     {
-        string pattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
-        return Regex.IsMatch(emailFieldValue, pattern);
+        string pattern = @"^[A-Za-z0-9._@-]{3,20}$";
+        return Regex.IsMatch(usernameFieldValue, pattern);
+    }
+
+    private bool CheckPassword(string passwordFieldValue)
+    {
+        string pattern = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\W_]{8,30}$";
+        return Regex.IsMatch(passwordFieldValue, pattern);
     }
 
     private void OnStartButtonClick()
@@ -193,17 +207,17 @@ public class UIentryScene : MonoBehaviour
 
     private void OnSignInButtonClick()
     {
-        signIn?.Invoke(signInEmailInput.value, signInPasswordInput.value);
+        signInButtonClick?.Invoke(signInUsernameInput.value, signInPasswordInput.value);
     }
 
-    private void OnAuthentificationFailed()
+    private void DisplaySignInError(string errorMessage)
     {
         signInButton.SetEnabled(false);
-        signInWarning.text = "Adresse email ou mot de passe incorrectes.\nCorrigez votre saisie ou créez un nouveau compte.";
+        signInUsernameWarning.text = errorMessage;
     }
 
     private void OnSignUpButtonClick()
     {
-        signUp?.Invoke(signUpEmailInput.value, signUpPasswordInput.value);
+        signUpButtonClick?.Invoke(signUpUsernameInput.value, signUpPasswordInput.value);
     }
 }
