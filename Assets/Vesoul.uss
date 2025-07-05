@@ -39,4 +39,7 @@
 
 .plainText {
     font-size: 30px;
+    -unity-font-style: bold;
+    color: rgb(0, 0, 0);
+    -unity-text-align: middle-center;
 }

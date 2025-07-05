@@ -4,7 +4,7 @@ using UnityEngine.UIElements;
 using System.Text.RegularExpressions;
 using UnityEngine.SceneManagement;
 
-public class UIentryScene : MonoBehaviour
+public class UIcloudSaveScene : MonoBehaviour
 {
     [SerializeField]
     private EntrySceneManager entrySceneManager;

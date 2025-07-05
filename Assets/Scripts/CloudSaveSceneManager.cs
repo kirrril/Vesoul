@@ -3,16 +3,13 @@ using UnityEngine.UIElements;
 using UnityEngine.SceneManagement;
 using System;
 
-public class EntrySceneManager : MonoBehaviour
+public class CloudSaveSceneManager : MonoBehaviour
 {
     [SerializeField]
-    private UIentryScene uiEntryScene;
+    private UIcloudSaveScene uiCloudSaveScene;
 
     [SerializeField]
     private CloudSave cloudSave;
-
-    [SerializeField]
-    private LocalSave localSave;
 
     public StartStop startStop;
 
@@ -26,14 +23,11 @@ public class EntrySceneManager : MonoBehaviour
 
     void Awake()
     {
-        startStop = new StartStop();
-        uiEntryScene.stopButtonClick += () => startStop.HandleStopClick();
-        uiEntryScene.startButtonClick += () => SceneManager.LoadScene("GameScene");
-        uiEntryScene.tryConnectCloud += () => tryConnectCloud?.Invoke();
+        uiCloudSaveScene.tryConnectCloud += () => tryConnectCloud?.Invoke();
         cloudSave.cloudConnected += () => cloudConnected?.Invoke();
         cloudSave.cloudConnectionFailed += () => noCloudConnection?.Invoke();
-        uiEntryScene.signInButtonClick += HandleSignIn;
-        uiEntryScene.signUpButtonClick += HandleSignUp;
+        uiCloudSaveScene.signInButtonClick += HandleSignIn;
+        uiCloudSaveScene.signUpButtonClick += HandleSignUp;
         cloudSave.authentificationErrorWarning += HandleSignInError;
     }
 
